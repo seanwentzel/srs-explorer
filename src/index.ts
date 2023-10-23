@@ -31,6 +31,15 @@ function readParams(): void {
     handleInput();
 }
 
+function setUrl(): void {
+    const url = new URL(window.location.href);
+    inputs.forEach((input: string) => {
+        const inputElement = document.getElementById(input) as HTMLInputElement;
+        url.searchParams.set(input, inputElement.value);
+    });
+    history.pushState({}, "", url);
+}
+
 function read(id: string): string {
     return (document.getElementById(id) as HTMLInputElement).value;
 }
@@ -57,6 +66,7 @@ function handleInput() {
         const ul = `<ul>${lis.join("")}</ul>`
         const output = document.getElementById("output") as HTMLElement;
         output.innerHTML = ul;
+        setUrl();
     }
 }
 
