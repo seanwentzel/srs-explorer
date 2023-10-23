@@ -1,8 +1,8 @@
-# String Replacement System Explorer
+# String Rewriting System Explorer
 
 Hosted [here](https://seanwentzel.github.io/srs-explorer/).
 
-This is a lightweight in-browser site to explore one rule String Replacement Systems.
+This is a lightweight in-browser site to explore one rule String Rewriting Systems.
 
 ## Prioritized improvemnts
 
