@@ -5,6 +5,7 @@ let in_string = "";
 let out_string = "";
 
 window.onload = () => {
+    readParams();
     inputs.forEach((input: string) => {
         possibleEvents.forEach((eventName: string) => {
             const inputElement = document.getElementById(input) as HTMLInputElement;
@@ -15,6 +16,20 @@ window.onload = () => {
         handleInput();
     });
 };
+
+function readParams(): void {
+    const params = new URL(window.location.href).searchParams;
+    let noop = true;
+    inputs.forEach((input: string) => {
+        const inputElement = document.getElementById(input) as HTMLInputElement;
+        const value = params.get(input);
+        if (value) {
+            inputElement.value = value;
+            noop = false;
+        }
+    });
+    handleInput();
+}
 
 function read(id: string): string {
     return (document.getElementById(id) as HTMLInputElement).value;
