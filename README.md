@@ -2,7 +2,7 @@
 
 Hosted [here](https://seanwentzel.github.io/srs-explorer/).
 
-This is a lightweight in-browser site to explore one rule String Rewriting Systems.
+This is a lightweight in-browser tool to explore one rule String Rewriting Systems.
 
 ## Prioritized improvements
 
