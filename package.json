@@ -4,8 +4,8 @@
     ],
     "scripts": {
         "start": "rm -r dist && parcel serve src/index.html",
-        "build": "rm -r dist && parcel build src/index.html --public-url .",
-        "deploy": "rm -r dist && parcel build src/index.html --public-url . && gh-pages -d dist"
+        "build": "parcel build src/index.html --public-url .",
+        "deploy": "parcel build src/index.html --public-url . && gh-pages -d dist"
     },
     "devDependencies": {
         "gh-pages": "^6.0.0",
