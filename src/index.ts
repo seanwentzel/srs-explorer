@@ -48,8 +48,8 @@ function renderResultStringHtml(result: Result) {
     if (result.loop_of === null) {
         return result.s;
     } else {
-        const idx = result.s.indexOf(result.loop_of.s);
-        return `${result.s.substring(0,idx)}<b>${result.loop_of.s}</b>${result.s.substring(idx+result.loop_of.s.length)}`;
+        const idx = result.s.indexOf(result.loop_of);
+        return `${result.s.substring(0,idx)}<b>${result.loop_of}</b>${result.s.substring(idx+result.loop_of.length)}`;
     }
 }
 
@@ -72,29 +72,41 @@ function handleInput() {
 
 type Result = {
     s: string;
-    parent: Result | null;
+    parents: Set<string>;
     depth: number;
-    loop_of: Result | null;
+    loop_of: string | null;
 }
 
-function findLoop(at: Result, haystack: string): Result | null {
-    if (haystack.indexOf(at.s) !== -1) {
-        return at;
-    } else if (at.parent === null) {
-        return null;
-    } else {
-        return findLoop(at.parent, haystack);
+function findLoop(universe: Map<string, Result>, res: Result, haystack: string): string | null {
+    const bfs = [res];
+    let at = 0;
+    const visited = new Set();
+    while(at < bfs.length) {
+        res = bfs[at];
+        if (haystack.indexOf(res.s) !== -1) {
+            return res.s;
+        }
+        for(const parent of res.parents) {
+            if(!visited.has(parent)) {
+                bfs.push(universe.get(parent) as Result);
+                visited.add(parent);
+            }
+        }
+        at ++;
     }
+    return null;
 }
 
-function* children(result: Result, in_string: string, out_string: string) {
+function* children(universe: Map<string, Result>, result: Result, in_string: string, out_string: string) {
     let at = result.s.indexOf(in_string);
     while (at !== -1) {
         const replaced = result.s.substring(0, at) + out_string + result.s.substring(at+in_string.length);
-        const loop_of = findLoop(result, replaced);
+        const loop_of = findLoop(universe, result, replaced);
+        const parents = new Set();
+        parents.add(result.s);
         yield {
             s: replaced,
-            parent: result,
+            parents,
             depth: result.depth + 1,
             loop_of
         };
@@ -105,19 +117,30 @@ function* children(result: Result, in_string: string, out_string: string) {
 function generateResults(start: string, in_string: string, out_string: string): Result[] {
     const firstResult: Result = {
         s: start,
-        parent: null,
+        parents: new Set(),
         depth: 0,
         loop_of: null
     }
-    let results = [firstResult];
+    const universe = new Map();
+    const queue = [firstResult];
+    universe.set(start, firstResult);
     let at = 0;
-    while(at < results.length && at < 500) {
-        if(results[at].loop_of === null) {
-            for(let res of children(results[at], in_string, out_string)) {
-                results.push(res);
+    while(at < queue.length && at < 500) {
+        if(queue[at].loop_of === null) {
+            for(let res of children(universe, queue[at], in_string, out_string)) {
+                if(!universe.has(res.s)) {
+                    queue.push(res);
+                    universe.set(res.s, res);
+                } else {
+                    const element = universe.get(res.s);
+                    element.parents.add(queue[at].s);
+                    if(element.loop_of === null) {
+                        element.loop_of = res.loop_of;
+                    }
+                }
             }
         }
         at += 1;
     }
-    return results;
+    return queue;
 }
